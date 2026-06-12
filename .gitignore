@@ -1,7 +1,0 @@
-#Ignoruje adresář .vagrant/ s metadaty
-.vagrant/
-
-#Ignoruje všechny soubory .box, kvůli velikosti
-*.box
-
-Vault_Decrypted.txt
