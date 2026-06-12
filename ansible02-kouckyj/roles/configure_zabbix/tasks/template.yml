@@ -1,0 +1,5 @@
+---
+- name: Import Zabbix host Linux template from yaml
+  community.zabbix.zabbix_template:
+    template_yaml: {{ "linux_template_path" }}
+    state: present

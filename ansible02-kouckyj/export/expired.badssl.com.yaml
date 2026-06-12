@@ -1,0 +1,22 @@
+zabbix_export:
+  version: '7.0'
+  host_groups:
+    - uuid: 64a1b5917a7f46b8b7010ee0f2db2b47
+      name: 'Web Certificate'
+  hosts:
+    - host: expired.badssl.com
+      name: expired.badssl.com
+      templates:
+        - name: 'Website certificate by Zabbix agent 2'
+      groups:
+        - name: 'Web Certificate'
+      interfaces:
+        - useip: 'NO'
+          ip: ''
+          dns: expired.badssl.com
+          interface_ref: if1
+      macros:
+        - macro: '{$CERT.WEBSITE.HOSTNAME}'
+          value: expired.badssl.com
+          description: 'The website DNS name for the connection.'
+      inventory_mode: DISABLED

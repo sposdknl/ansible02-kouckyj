@@ -1,0 +1,33 @@
+---
+# Vytvoření dedikovaného API uživatele s vysokým oprávněním pro potřeby Grafany
+- name: Create a new Zabbix user
+  community.zabbix.zabbix_user:
+    username: "{{ zabbix_api_user }}"
+    passwd: "{{ zabbix_api_user_password }}"
+    role_name: "Super admin role"
+    usrgrps:
+      - "Zabbix administrators"
+    state: present
+
+- name: Create user Jakub Koucký
+  community.zabbix.zabbix_user:
+    username: "jakub.koucky"
+    passwd: "MojeHeslo123!"
+    name: "Jakub"
+    surname: "Koucký"
+    role_name: "User role"
+    usrgrps:
+      - "Guests"
+    user_medias:
+      - mediatype: "Email"
+        sendto: "koucky.jakub@student.sposdk.cz"
+        active: true
+        period: "1-7,00:00-24:00"
+        severity:
+          not_classified: false
+          information: false
+          warning: true
+          average: true
+          high: true
+          disaster: true
+    state: present

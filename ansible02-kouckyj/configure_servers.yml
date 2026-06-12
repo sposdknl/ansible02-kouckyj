@@ -1,0 +1,66 @@
+---
+- name: Configure managed nodes
+  hosts: managed_nodes
+  become: true
+  tasks:
+    #Update před spuštěním a prováděním čehokoliv a instalace potřebných balíčků
+    - name: Update and install Git
+      ansible.builtin.apt:
+        update_cache: true
+        name:
+          - git
+          - net-tools
+          - joe
+          - mc
+          
+    #Spuštění playbooku pro instalaci Dockeru
+    - name: Preinstall Docker
+      ansible.builtin.import_tasks: /opt/repo/pre-install-docker.yml
+
+#Instalace Zabbix agent 2 na všechny uzly
+- name: Install Zabbix agent2
+  hosts: all
+  become: true
+  tasks:
+    - name: Import tasks for installation
+      ansible.builtin.import_tasks: /opt/repo/install-zabbix-agent2.yml
+
+#Instalace a spuštění Zabbixu v Dockeru
+- name: Configure and start Zabbix in Docker
+  hosts: zabbix_servers
+  become: true
+  tasks:
+    - name: Clone Zabbix git repository
+      ansible.builtin.git:
+        repo: 'https://github.com/zabbix/zabbix-docker'
+        dest: /opt/zabbix-docker/
+        version: 3ae46dd2c2a75f22ef6a002cbc060c29fee7b2d8
+    
+    - name: Docker compose
+      community.docker.docker_compose_v2:
+        project_src: /opt/zabbix-docker
+        files:
+          -   docker-compose_v3_ubuntu_pgsql_latest.yaml
+      register: output
+
+#Instalace a spuštění Grafany v Dockeru
+- name: Configure and start Grafana in Docker
+  hosts: grafana_servers
+  become: true
+  vars_files:
+    - vars/vault.yml
+  tasks:
+    - name: Create a directory for the docker-compose.yaml
+      ansible.builtin.file:
+        path: /opt/grafana
+        state: directory
+    
+    - name: Copy docker-compose.yaml to the server
+      ansible.builtin.template:
+        src: /opt/repo/grafana-compose.yaml.j2
+        dest: /opt/grafana/docker-compose.yaml
+
+    - name: Docker compose
+      community.docker.docker_compose_v2:
+        project_src: /opt/grafana
+      register: output

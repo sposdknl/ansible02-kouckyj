@@ -1,0 +1,9 @@
+- name: configure-zabbix-server
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/vault.yml
+    - vars/zabbix_connection.yml
+
+  roles:
+    - { role: configure_zabbix }

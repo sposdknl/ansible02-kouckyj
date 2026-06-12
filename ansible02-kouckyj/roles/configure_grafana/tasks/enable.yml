@@ -1,0 +1,14 @@
+---
+# Jelikož standardní moduly nemusí pokrývat vše, používáme modul 'uri' pro přímý POST požadavek na API
+- name: Enable Zabbix plugin
+  ansible.builtin.uri:
+    url: "http://192.168.1.3:3000/api/plugins/alexanderzobnin-zabbix-app/settings"
+    method: POST
+    user: "admin"
+    password: "{{ grafana_admin_password }}"
+    force_basic_auth: yes # Nutné pro autentizaci proti API Grafany
+    body_format: json
+    body:
+      id: "alexanderzobnin-zabbix-app"
+      enabled: true
+    status_code: 200 # Očekáváme úspěšné potvrzení od serveru

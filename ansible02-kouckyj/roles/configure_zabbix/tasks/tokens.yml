@@ -1,0 +1,28 @@
+---
+- name: Create Zabbix user token
+  community.zabbix.zabbix_token:
+#    http_login_user: "Admin"
+#    http_login_password: "{{ zabbix_admin_user_default_password }}"
+    name: Grafana token
+    username: "{{ zabbix_api_user }}"
+    state: present
+    generate_token: true
+    expires_at: 0
+  # Výstup modulu (obsahující vygenerovaný token) uložíme do proměnné
+  register: grafana_token_output
+
+- name: Create directory for the token
+  ansible.builtin.file:
+    path: "/opt/tokens"
+    state: directory
+    mode: '0755'
+  become: true
+
+# Uložení tokenu do souboru na Bastion, aby ho později mohla přečíst role pro Grafanu
+- name: Save the token into local file
+  ansible.builtin.copy:
+    dest: "/opt/tokens/grafana_token.txt"
+    content: "{{ grafana_token_output.token }}"
+    mode: '0600'
+  become: true
+  when: grafana_token_output.token is defined

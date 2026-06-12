@@ -1,0 +1,43 @@
+---
+- name: Install and prepare Ansible
+  hosts: all #protože Ansible nevidí žádné jiné uzly
+  become: true
+  tasks:
+
+  #Update před spuštěním a prováděním čehokoliv a instalace potřebných balíčků
+  - name: Update and upgrade
+    ansible.builtin.apt:
+      update_cache: true
+      name:
+        - git
+        - sshpass
+        - net-tools
+        - joe
+        - mc
+      state: present
+
+  #Instalace potřebných kolekcí
+  - name: Install Ansible collections
+    ansible.builtin.command:
+      cmd: ansible-galaxy collection install community.zabbix community.grafana community.docker --force
+
+  #Naklonování repozitáře
+  - name: Cloning Git repository
+    ansible.builtin.git:
+      repo: 'https://github.com/JanMizera/MP-Automatizovana-instalace-a-sprava-Grafana-pomoci-Ansible.git'
+      dest: /opt/repo
+
+  #Ukončení provisioningu
+  #Spouštění nového procesu a zahájení správy konfigurace
+  #Při tomto procesu si Ansiblew převezme konfiguraci z ansible.cfg a inventory.ini
+  - name: Bootstrap server configuration from repository
+    ansible.builtin.command:
+      cmd: ansible-playbook configure_servers.yml
+      chdir: /opt/repo
+    become: false
+    register: configure_output
+
+  #Vypsání logu do příkazové řádky
+  - name: Print output from configure_servers playbook
+    ansible.builtin.debug:
+      var: configure_output.stdout_lines

@@ -1,0 +1,18 @@
+---
+- name: Add datasource
+  community.grafana.grafana_datasource:
+    name: Zabbix
+    url: "http://192.168.1.3:3000"
+    url_username: admin
+    url_password: "{{ grafana_admin_password }}"
+    ds_type: alexanderzobnin-zabbix-datasource
+    ds_url: "http://192.168.1.2/api_jsonrpc.php" # Adresa Zabbix API
+    access: proxy
+    state: present
+    uid: "afehitfoh97nka" # Statické UID pro konzistenci v dashboardech
+    additional_json_data:
+      authType: "token"
+      trends: true
+    additional_secure_json_data:
+      # Zde načítáme token, který vygenerovala a uložila předchozí role (Zabbix)
+      apiToken: "{{ lookup('ansible.builtin.file', '/opt/tokens/grafana_token.txt') }}"

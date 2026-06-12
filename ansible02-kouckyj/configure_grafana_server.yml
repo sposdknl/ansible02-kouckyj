@@ -1,0 +1,8 @@
+---
+- name: configure-zabbix-server
+  hosts: localhost
+  vars_files:
+    - vars/vault.yml
+
+  roles:
+    - { role: configure_grafana }

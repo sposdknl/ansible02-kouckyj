@@ -1,0 +1,8 @@
+---
+- name: Change default user passwd
+  community.zabbix.zabbix_user:
+    username: "{{ zabbix_admin_user }}"
+    passwd: "{{ zabbix_admin_user_password }}"
+    usrgrps:
+      - "Zabbix administrators"
+    override_passwd: true
